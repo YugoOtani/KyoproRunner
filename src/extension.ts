@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-const EXTENSION_NAME = "kyopro executer";
+const EXTENSION_NAME = "Kyopro Runner";
 
 export function activate(context: vscode.ExtensionContext) {
   const provider = new ExecuteViewProvider(context.extensionUri);
