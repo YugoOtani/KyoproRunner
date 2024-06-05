@@ -11,27 +11,6 @@ export function activate(context: vscode.ExtensionContext) {
     ),
   );
 }
-
-const openTerminal = () => {
-  const workspaceFolders = vscode.workspace.workspaceFolders;
-  if (!workspaceFolders) {
-    vscode.window.showErrorMessage("No workspace folder open");
-    return null;
-  }
-
-  const workspacePath = workspaceFolders[0].uri.fsPath;
-  let terminal = vscode.window.terminals.find(
-    (term) => term.name === EXTENSION_NAME && !term.state.isInteractedWith,
-  );
-  if (!terminal) {
-    terminal = vscode.window.createTerminal({
-      name: EXTENSION_NAME,
-      cwd: workspacePath,
-    });
-  }
-  return terminal;
-};
-
 export function deactivate() {}
 
 class ExecuteViewProvider implements vscode.WebviewViewProvider {
@@ -54,16 +33,11 @@ class ExecuteViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.onDidReceiveMessage(async (data) => {
       switch (data.type) {
         case "executeCommand": {
-          this._executeCommand(data.value);
+          executeCommand(data.value);
           break;
         }
       }
     });
-  }
-  private _executeCommand(input: string) {
-    const term = openTerminal();
-    term?.show();
-    term?.sendText(input);
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
@@ -96,7 +70,30 @@ class ExecuteViewProvider implements vscode.WebviewViewProvider {
 		</html>`;
   }
 }
+function executeCommand(input: string) {
+  const term = openTerminal();
+  term?.show();
+  term?.sendText(input);
+}
+function openTerminal() {
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (!workspaceFolders) {
+    vscode.window.showErrorMessage("No workspace folder open");
+    return null;
+  }
 
+  const workspacePath = workspaceFolders[0].uri.fsPath;
+  let terminal = vscode.window.terminals.find(
+    (term) => term.name === EXTENSION_NAME && !term.state.isInteractedWith,
+  );
+  if (!terminal) {
+    terminal = vscode.window.createTerminal({
+      name: EXTENSION_NAME,
+      cwd: workspacePath,
+    });
+  }
+  return terminal;
+}
 function getNonce() {
   let text = "";
   const possible =
