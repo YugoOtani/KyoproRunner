@@ -26,7 +26,17 @@
         "command": "rust-worksheet.executeCommand",
         "title": "Execute Command"
       }
-    ]
+    ],
+    "configuration":{
+      "title": "Kyopro Runner",
+      "properties": {
+          "runtime.command": {
+            "type": "string",
+            "default": "not found",
+            "description": "Specifies the command when button is pressed"
+          }
+        }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

@@ -71,7 +71,14 @@ class ExecuteViewProvider implements vscode.WebviewViewProvider {
 }
 function executeCommand(input: string) {
   const term = openTerminal();
+  const s: string | undefined = vscode.workspace
+    .getConfiguration()
+    .get("runtime.command");
   term?.show();
+  if (s) {
+    term?.sendText(s);
+  }
+
   term?.sendText(input);
 }
 function openTerminal() {
