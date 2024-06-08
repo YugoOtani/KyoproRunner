@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { executeCommand } from "./exec";
+import { TerminalWrapper } from "./exec";
 export const EXTENSION_NAME = "Kyopro Runner";
 export function activate(context: vscode.ExtensionContext) {
   const provider = new ExecuteViewProvider(context.extensionUri);
@@ -15,6 +15,10 @@ export function deactivate() {}
 
 class ExecuteViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "rust-worksheet.executeCommand";
+  private term = TerminalWrapper.create();
+  private command: string | undefined = vscode.workspace
+    .getConfiguration()
+    .get("runtime.command");
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
@@ -33,7 +37,10 @@ class ExecuteViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.onDidReceiveMessage(async (data) => {
       switch (data.type) {
         case "executeCommand": {
-          executeCommand(data.value);
+          if (this.command) {
+            this.term?.sendText(this.command);
+            this.term?.sendText(data.value);
+          }
           break;
         }
       }
