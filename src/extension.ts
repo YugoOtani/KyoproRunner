@@ -15,7 +15,7 @@ export function deactivate() {}
 
 class ExecuteViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "rust-worksheet.executeCommand";
-  private term = TerminalWrapper.create();
+  private term = new TerminalWrapper();
   private command: string | undefined = vscode.workspace
     .getConfiguration()
     .get("runtime.command");
@@ -38,8 +38,7 @@ class ExecuteViewProvider implements vscode.WebviewViewProvider {
       switch (data.type) {
         case "executeCommand": {
           if (this.command) {
-            this.term?.sendText(this.command);
-            this.term?.sendText(data.value);
+            this.term?.sendTexts([this.command, data.value]);
           }
           break;
         }

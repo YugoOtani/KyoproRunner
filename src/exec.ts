@@ -3,29 +3,43 @@ import { EXTENSION_NAME } from "./extension";
 
 export class TerminalWrapper {
   private current: vscode.Terminal | null;
-  private constructor() {
+  public constructor() {
     this.current = null;
   }
-  public static create(): TerminalWrapper | null {
-    let term = new TerminalWrapper();
-    let path = workspacePath();
+  public sendTexts(input: string[]) {
+    if (!this.current){
+        this.current = findTerminal();
+    }
+    if (!this.current){
+        this.current = createTerminal();
+    }
+    this.current?.show();
+    for (const s of input){
+        this.current?.sendText(s);
+    }
+    
+  }
+}
+function findTerminal(){
+    const t = vscode.window.terminals.find(term=>term.name === EXTENSION_NAME);
+    if (t){
+        return t;
+    }else{
+        return null;
+    }
+}
+function createTerminal(){
+    const path = workspacePath();
     if (path) {
-      term.current = vscode.window.createTerminal({
+      return vscode.window.createTerminal({
         name: EXTENSION_NAME,
         cwd: path,
       });
     } else {
-      term.current = vscode.window.createTerminal({
+      return vscode.window.createTerminal({
         name: EXTENSION_NAME,
       });
     }
-    return term;
-  }
-  public sendText(input: string) {
-    const term = this.current;
-    this.current?.show();
-    term?.sendText(input);
-  }
 }
 
 function workspacePath() {
