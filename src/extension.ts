@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { TerminalWrapper } from "./exec";
 export const EXTENSION_NAME = "Kyopro Runner";
+const tmp  = "tmp";
 export function activate(context: vscode.ExtensionContext) {
   const provider = new ExecuteViewProvider(context.extensionUri);
 
