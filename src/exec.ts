@@ -49,3 +49,17 @@ function workspacePath() {
   }
   return workspaceFolders[0].uri.fsPath;
 }
+
+export function addFunctionCallToMain(fileContent: string, functionName: string): string {
+  const mainRegex = /fn\s+main\s*\(\s*\)\s*{([\s\S]*?)}/;
+  const match = mainRegex.exec(fileContent);
+
+  if (match) {
+    const mainContent = match[1];
+    const updatedMainContent = `${mainContent.trim()}\n    ${functionName}();`;
+    return fileContent.replace(mainRegex, `fn main() {\n${updatedMainContent}\n}`);
+  } else {
+    // If there's no main function, add one
+    return `${fileContent}\n\nfn main() {\n    ${functionName}();\n}`;
+  }
+}
