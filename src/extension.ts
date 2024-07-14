@@ -1,7 +1,5 @@
 import * as vscode from "vscode";
-import { TerminalWrapper,addFunctionCallToMain } from "./exec";
-import fs from 'fs';
-import path from 'path';
+import { TerminalWrapper } from "./exec";
 export const EXTENSION_NAME = "Kyopro Runner";
 export function activate(context: vscode.ExtensionContext) {
   const provider = new ExecuteViewProvider(context.extensionUri);
@@ -12,68 +10,12 @@ export function activate(context: vscode.ExtensionContext) {
       provider,
     ),
   );
-  let disposable = vscode.commands.registerCommand('rust-worksheet.runFunction', async (args) => {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-      vscode.window.showErrorMessage('No active editor found');
-      return;
-    }
-
-    const document = editor.document;
-    const position = editor.selection.active;
-    const wordRange = document.getWordRangeAtPosition(position);
-    const functionName = document.getText(wordRange);
-
-    if (!functionName) {
-      vscode.window.showErrorMessage('No function selected');
-      return;
-    }
-
-    const filePath = document.uri.fsPath;
-    const fileContent = document.getText();
-
-    // Add the function call to main function
-    const updatedContent = addFunctionCallToMain(fileContent, functionName);
-
-    // Write the updated content to a temporary file
-    const mainFilePath = path.join(path.dirname(filePath), 'main.rs');
-    fs.writeFileSync(mainFilePath, updatedContent);
-
-    // Run the Rust program
-    const terminal = vscode.window.createTerminal('Run Rust Function');
-    terminal.sendText(`cargo run`);
-    terminal.show();
-    fs.writeFileSync(mainFilePath, fileContent);
-  });
-  context.subscriptions.push(disposable);
-  const codeActionProvider: vscode.CodeActionProvider = {
-    provideCodeActions(document, range, context, token) {
-      const wordRange = document.getWordRangeAtPosition(range.start);
-      const word = document.getText(wordRange);
-      if (word) {
-        return [
-          {
-            title: `Run ${word}`,
-            command: 'extension.runFunction',
-            arguments: [document.uri, wordRange]
-          }
-        ];
-      }
-      return [];
-    }
-  };
-
-  context.subscriptions.push(
-    vscode.languages.registerCodeActionsProvider('rust', codeActionProvider, {
-      providedCodeActionKinds: [vscode.CodeActionKind.Empty]
-    })
-  );
 }
 export function deactivate() {}
 
 class ExecuteViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "rust-worksheet.executeCommand";
-  private term = new TerminalWrapper();
+  private term = TerminalWrapper.create();
   private command: string | undefined = vscode.workspace
     .getConfiguration()
     .get("runtime.command");
@@ -96,7 +38,8 @@ class ExecuteViewProvider implements vscode.WebviewViewProvider {
       switch (data.type) {
         case "executeCommand": {
           if (this.command) {
-            this.term?.sendTexts([this.command, data.value]);
+            this.term?.sendText(this.command);
+            this.term?.sendText(data.value);
           }
           break;
         }

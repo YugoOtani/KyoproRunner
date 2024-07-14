@@ -9,10 +9,7 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:extension.runFunction",
-    "onLanguage:rust"
-  ],
+  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "views": {
@@ -28,10 +25,6 @@
       {
         "command": "rust-worksheet.executeCommand",
         "title": "Execute Command"
-      },
-      {
-        "command": "rust-worksheet.runFunction",
-        "title": "Run Rust Function"
       }
     ],
     "configuration":{
