@@ -9,7 +9,7 @@
 - VSCodeの方のコマンドの命名をちゃんとする
 - デバッガと連携する(code-lldbでは標準入力のために設定ファイルの変更が必要)
 
-##　 デモ
+## デモ
 
 
 https://github.com/user-attachments/assets/8bc6dfc9-5b48-4af3-9ffc-8f3a7e5fbae2
