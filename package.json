@@ -17,7 +17,7 @@
         {
           "type": "webview",
           "id": "rust-worksheet.executeCommand",
-          "name": "Cargo Run"
+          "name": "Kyopro Runner"
         }
       ]
     },
@@ -25,7 +25,13 @@
       {
         "command": "rust-worksheet.executeCommand",
         "title": "Execute Command"
+      },
+      {
+        "command": "rust-worksheet.openCustomTerminal",
+        "title": "CustomTerminal"
       }
+
+
     ],
     "configuration":{
       "title": "Kyopro Runner",

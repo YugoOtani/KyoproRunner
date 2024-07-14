@@ -10,6 +10,32 @@ export function activate(context: vscode.ExtensionContext) {
       provider,
     ),
   );
+  context.subscriptions.push(
+    vscode.commands.registerCommand('rust-worksheet.openCustomTerminal', () => {
+        const writeEmitter = new vscode.EventEmitter<string>();
+        const pty: vscode.Pseudoterminal = {
+            onDidWrite: writeEmitter.event,
+            open: () => {
+                writeEmitter.fire('Custom Terminal started\r\n');
+            },
+            close: () => {
+                // ターミナルが閉じられたときの処理
+            },
+            handleInput: (data: string) => {
+                // ユーザー入力の処理
+                if (data === '\r') { // Enter key
+                    writeEmitter.fire('You typed Enter\r\n');
+                } else {
+                    writeEmitter.fire(`You typed ${data}\r\n`);
+                }
+            }
+        };
+
+        const terminal = vscode.window.createTerminal({ name: 'Custom Terminal', pty });
+        terminal.show();
+    })
+);
+
 }
 export function deactivate() {}
 
